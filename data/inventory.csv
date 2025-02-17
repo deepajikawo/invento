@@ -1,0 +1,4 @@
+model,brand,price,quantity,last_updated
+iPhone 13,Apple,999.99,15,2023-08-01 10:00:00
+Galaxy S21,Samsung,899.99,12,2023-08-01 10:00:00
+Pixel 6,Google,699.99,8,2023-08-01 10:00:00
