@@ -13,6 +13,7 @@ from utils import (
     get_sales_summary
 )
 from models import PaymentMethod
+from auth import init_auth, require_auth, require_admin, show_login_page, logout_user
 
 st.set_page_config(
     page_title="Phone Shop Inventory Management",
@@ -24,25 +25,38 @@ if 'inventory_updated' not in st.session_state:
     st.session_state.inventory_updated = False
 
 def main():
-    st.title("📱 Phone Shop Inventory Management")
+    init_auth()
 
-    # Sidebar navigation
-    page = st.sidebar.selectbox(
-        "Navigation",
-        ["Dashboard", "Manage Inventory", "Record Sale", "Reports"]
-    )
+    if st.session_state.user:
+        st.title("📱 Phone Shop Inventory Management")
 
-    # Load inventory data
-    df = load_inventory()
+        # User info and logout in sidebar
+        with st.sidebar:
+            st.write(f"Welcome, {st.session_state.user['username']}!")
+            if st.button("Logout"):
+                logout_user()
+                st.experimental_rerun()
 
-    if page == "Dashboard":
-        show_dashboard(df)
-    elif page == "Manage Inventory":
-        show_inventory_management(df)
-    elif page == "Record Sale":
-        show_sales_management(df)
+        # Sidebar navigation
+        page = st.sidebar.selectbox(
+            "Navigation",
+            ["Dashboard", "Manage Inventory", "Record Sale", "Reports"]
+        )
+
+        # Load inventory data
+        df = load_inventory()
+
+        if page == "Dashboard":
+            show_dashboard(df)
+        elif page == "Manage Inventory":
+            require_admin()  # Only admins can manage inventory
+            show_inventory_management(df)
+        elif page == "Record Sale":
+            show_sales_management(df)
+        else:
+            show_reports(df)
     else:
-        show_reports(df)
+        show_login_page()
 
 def show_dashboard(df):
     st.header("Dashboard")

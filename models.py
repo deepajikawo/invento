@@ -1,9 +1,10 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Enum
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Enum, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 from datetime import datetime
 import enum
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Get database URL from environment variable
 DATABASE_URL = os.getenv('DATABASE_URL')
@@ -28,6 +29,23 @@ class PaymentMethod(enum.Enum):
     CREDIT_CARD = "credit_card"
     DEBIT_CARD = "debit_card"
     MOBILE_PAYMENT = "mobile_payment"
+
+class User(Base):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    password_hash = Column(String, nullable=False)
+    is_admin = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.now)
+    last_login = Column(DateTime)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Phone(Base):
     __tablename__ = 'phones'
