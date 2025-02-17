@@ -93,7 +93,7 @@ def show_login_page():
     with col2:
         st.markdown("""
             <div style='text-align: center'>
-                <h1 style='color: #2E4053'>📱 Phone Shop</h1>
+                <h1 style='color: #2E4053'>📱 Austin Phones and Gadgets</h1>
                 <p style='color: #566573'>Inventory Management System</p>
             </div>
         """, unsafe_allow_html=True)
@@ -161,6 +161,6 @@ def show_login_page():
     # Footer
     st.markdown("""
         <div style='text-align: center; margin-top: 20px; color: #566573'>
-            <p>Secure login powered by Phone Shop IMS</p>
+            <p>Secure login powered by Austin Phones and Gadgets IMS</p>
         </div>
     """, unsafe_allow_html=True)

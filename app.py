@@ -17,7 +17,7 @@ from auth import init_auth, require_auth, require_admin, show_login_page, logout
 
 # Set page config first, before any other Streamlit commands
 st.set_page_config(
-    page_title="Phone Shop Inventory Management",
+    page_title="Austin Phones and Gadgets - Inventory Management",
     page_icon="📱",
     layout="wide"
 )
@@ -30,7 +30,7 @@ def main():
     init_auth()
 
     if st.session_state.user:
-        st.title("📱 Phone Shop Inventory Management")
+        st.title("📱 Austin Phones and Gadgets")
 
         # User info and logout in sidebar
         with st.sidebar:
