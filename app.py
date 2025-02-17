@@ -35,7 +35,7 @@ def main():
             st.write(f"Welcome, {st.session_state.user['username']}!")
             if st.button("Logout"):
                 logout_user()
-                st.experimental_rerun()
+                st.rerun()
 
         # Sidebar navigation
         page = st.sidebar.selectbox(

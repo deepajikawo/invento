@@ -22,7 +22,7 @@ def register_user(username, email, password, is_admin=False):
             is_admin=is_admin
         )
         user.set_password(password)
-        
+
         session.add(user)
         session.commit()
         return True, "Registration successful"
@@ -71,32 +71,32 @@ def require_admin():
 
 def show_login_page():
     st.title("Login")
-    
+
     tab1, tab2 = st.tabs(["Login", "Register"])
-    
+
     with tab1:
         with st.form("login_form"):
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
-            
+
             if st.form_submit_button("Login"):
                 if username and password:
                     success, message = login_user(username, password)
                     if success:
                         st.success(message)
-                        st.experimental_rerun()
+                        st.rerun()
                     else:
                         st.error(message)
                 else:
                     st.error("Please fill in all fields")
-    
+
     with tab2:
         with st.form("register_form"):
             new_username = st.text_input("Username")
             new_email = st.text_input("Email")
             new_password = st.text_input("Password", type="password")
             confirm_password = st.text_input("Confirm Password", type="password")
-            
+
             if st.form_submit_button("Register"):
                 if new_username and new_email and new_password and confirm_password:
                     if new_password != confirm_password:
@@ -107,7 +107,7 @@ def show_login_page():
                             st.success(message)
                             success, _ = login_user(new_username, new_password)
                             if success:
-                                st.experimental_rerun()
+                                st.rerun()
                         else:
                             st.error(message)
                 else:
