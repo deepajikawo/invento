@@ -15,8 +15,10 @@ from utils import (
 from models import PaymentMethod
 from auth import init_auth, require_auth, require_admin, show_login_page, logout_user
 
+# Set page config first, before any other Streamlit commands
 st.set_page_config(
     page_title="Phone Shop Inventory Management",
+    page_icon="📱",
     layout="wide"
 )
 

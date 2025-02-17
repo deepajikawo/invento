@@ -70,45 +70,97 @@ def require_admin():
         st.stop()
 
 def show_login_page():
-    st.title("Login")
+    # Custom CSS for styling
+    st.markdown("""
+        <style>
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 24px;
+        }
+        .stTabs [data-baseweb="tab"] {
+            padding: 16px;
+        }
+        .form-container {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
-    tab1, tab2 = st.tabs(["Login", "Register"])
+    # App logo and title
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("""
+            <div style='text-align: center'>
+                <h1 style='color: #2E4053'>📱 Phone Shop</h1>
+                <p style='color: #566573'>Inventory Management System</p>
+            </div>
+        """, unsafe_allow_html=True)
+
+    # Login/Register tabs with icons
+    tab1, tab2 = st.tabs(["🔑 Login", "✨ Register"])
 
     with tab1:
+        st.markdown("<div class='form-container'>", unsafe_allow_html=True)
         with st.form("login_form"):
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
+            st.markdown("### 👤 Welcome Back!")
+            username = st.text_input("Username", placeholder="Enter your username")
+            password = st.text_input("Password", type="password", placeholder="Enter your password")
 
-            if st.form_submit_button("Login"):
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                submit_button = st.form_submit_button("🚀 Login", 
+                    use_container_width=True,
+                    help="Click to log in to your account")
+
+            if submit_button:
                 if username and password:
                     success, message = login_user(username, password)
                     if success:
-                        st.success(message)
+                        st.success("🎉 " + message)
                         st.rerun()
                     else:
-                        st.error(message)
+                        st.error("❌ " + message)
                 else:
-                    st.error("Please fill in all fields")
+                    st.error("⚠️ Please fill in all fields")
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with tab2:
+        st.markdown("<div class='form-container'>", unsafe_allow_html=True)
         with st.form("register_form"):
-            new_username = st.text_input("Username")
-            new_email = st.text_input("Email")
-            new_password = st.text_input("Password", type="password")
-            confirm_password = st.text_input("Confirm Password", type="password")
+            st.markdown("### 🌟 Create Account")
+            new_username = st.text_input("Username", placeholder="Choose a username")
+            new_email = st.text_input("Email", placeholder="Enter your email")
+            new_password = st.text_input("Password", type="password", placeholder="Choose a password")
+            confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password")
 
-            if st.form_submit_button("Register"):
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                register_button = st.form_submit_button("✨ Register", 
+                    use_container_width=True,
+                    help="Click to create your account")
+
+            if register_button:
                 if new_username and new_email and new_password and confirm_password:
                     if new_password != confirm_password:
-                        st.error("Passwords do not match")
+                        st.error("❌ Passwords do not match")
                     else:
                         success, message = register_user(new_username, new_email, new_password)
                         if success:
-                            st.success(message)
+                            st.success("🎉 " + message)
                             success, _ = login_user(new_username, new_password)
                             if success:
                                 st.rerun()
                         else:
-                            st.error(message)
+                            st.error("❌ " + message)
                 else:
-                    st.error("Please fill in all fields")
+                    st.error("⚠️ Please fill in all fields")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # Footer
+    st.markdown("""
+        <div style='text-align: center; margin-top: 20px; color: #566573'>
+            <p>Secure login powered by Phone Shop IMS</p>
+        </div>
+    """, unsafe_allow_html=True)
