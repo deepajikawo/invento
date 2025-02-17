@@ -7,8 +7,12 @@ from datetime import datetime
 # Get database URL from environment variable
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-# Create database engine
-engine = create_engine(DATABASE_URL)
+# Create database engine with proper configuration
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    connect_args={'sslmode': 'require'}
+)
 
 # Create declarative base
 Base = declarative_base()
