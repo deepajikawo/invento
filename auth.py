@@ -98,8 +98,11 @@ def show_login_page():
             </div>
         """, unsafe_allow_html=True)
 
-    # Login/Register tabs with icons
-    tab1, tab2 = st.tabs(["🔑 Login", "✨ Register"])
+    # Show registration tab only for admins
+    if st.session_state.user and st.session_state.user.get('is_admin'):
+        tab1, tab2 = st.tabs(["🔑 Login", "✨ Manage Users"])
+    else:
+        tab1 = st.tabs(["🔑 Login"])[0]
 
     with tab1:
         st.markdown("<div class='form-container'>", unsafe_allow_html=True)
@@ -127,35 +130,51 @@ def show_login_page():
         st.markdown("</div>", unsafe_allow_html=True)
 
     with tab2:
+        require_admin()  # Ensure only admins can access this tab
         st.markdown("<div class='form-container'>", unsafe_allow_html=True)
-        with st.form("register_form"):
-            st.markdown("### 🌟 Create Account")
+        
+        # User creation form
+        with st.form("create_user_form"):
+            st.markdown("### 👥 Create New User")
             new_username = st.text_input("Username", placeholder="Choose a username")
-            new_email = st.text_input("Email", placeholder="Enter your email")
+            new_email = st.text_input("Email", placeholder="Enter email")
             new_password = st.text_input("Password", type="password", placeholder="Choose a password")
-            confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm your password")
+            confirm_password = st.text_input("Confirm Password", type="password", placeholder="Confirm password")
+            is_admin = st.checkbox("Grant Admin Access")
 
             col1, col2, col3 = st.columns([1, 2, 1])
             with col2:
-                register_button = st.form_submit_button("✨ Register", 
-                    use_container_width=True,
-                    help="Click to create your account")
+                create_button = st.form_submit_button("➕ Create User", 
+                    use_container_width=True)
 
-            if register_button:
+            if create_button:
                 if new_username and new_email and new_password and confirm_password:
                     if new_password != confirm_password:
                         st.error("❌ Passwords do not match")
                     else:
-                        success, message = register_user(new_username, new_email, new_password)
+                        success, message = register_user(new_username, new_email, new_password, is_admin)
                         if success:
                             st.success("🎉 " + message)
-                            success, _ = login_user(new_username, new_password)
-                            if success:
-                                st.rerun()
+                            st.rerun()
                         else:
                             st.error("❌ " + message)
                 else:
                     st.error("⚠️ Please fill in all fields")
+        
+        # Display existing users
+        st.markdown("### 📋 Existing Users")
+        session = Session()
+        users = session.query(User).all()
+        for user in users:
+            col1, col2, col3 = st.columns([2, 2, 1])
+            with col1:
+                st.write(f"👤 {user.username}")
+            with col2:
+                st.write(f"📧 {user.email}")
+            with col3:
+                if user.is_admin:
+                    st.write("🔑 Admin")
+        session.close()
         st.markdown("</div>", unsafe_allow_html=True)
 
     # Footer
