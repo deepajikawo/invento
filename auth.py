@@ -219,28 +219,6 @@ def show_login_page():
         session.close()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Password change section for logged-in users
-    if st.session_state.user:
-        st.markdown("### 🔒 Change Password")
-        with st.form("change_password_form"):
-            current_password = st.text_input("Current Password", type="password")
-            new_password = st.text_input("New Password", type="password")
-            confirm_new_password = st.text_input("Confirm New Password", type="password")
-            
-            if st.form_submit_button("Change Password"):
-                if new_password != confirm_new_password:
-                    st.error("New passwords do not match!")
-                else:
-                    session = Session()
-                    user = session.query(User).filter_by(id=st.session_state.user['id']).first()
-                    if user and user.check_password(current_password):
-                        user.set_password(new_password)
-                        session.commit()
-                        st.success("Password changed successfully!")
-                    else:
-                        st.error("Current password is incorrect!")
-                    session.close()
-
     # Footer
     st.markdown("""
         <div style='text-align: center; margin-top: 20px; color: #566573'>
