@@ -198,17 +198,21 @@ def show_sales_management(df):
         st.warning("No items in inventory. Please add items first.")
         return
 
-    with st.form("record_sale_form"):
+    with st.form("record_sale_form", clear_on_submit=True):
         # Product selection
-        phone_model = st.selectbox("Select Product", df['model'].tolist())
+        phone_model = st.selectbox("Select Product", df['model'].tolist(), key='product_select')
         selected_phone = df[df['model'] == phone_model].iloc[0]
 
-        st.info(f"Available stock: {int(selected_phone['quantity'])} units")
-        st.info(f"Unit price: ₦{selected_phone['price']:.2f}")
+        # Display product info
+        col1, col2 = st.columns(2)
+        with col1:
+            st.info(f"Available stock: {int(selected_phone['quantity'])} units")
+        with col2:
+            st.info(f"Unit price: ₦{selected_phone['price']:.2f}")
 
         # Sale details
-        quantity = st.number_input("Quantity", min_value=1, max_value=int(selected_phone['quantity']), value=1)
-        unit_price = st.number_input("Unit Price ($)", min_value=0.0, value=float(selected_phone['price']), step=0.01)
+        quantity = st.number_input("Quantity", min_value=1, max_value=int(selected_phone['quantity']), value=1, key='quantity_input')
+        unit_price = st.number_input("Unit Price (₦)", min_value=0.0, value=float(selected_phone['price']), step=0.01, key='price_input')
         payment_method = st.selectbox("Payment Method", [method.value for method in PaymentMethod])
 
         # Customer details
