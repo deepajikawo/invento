@@ -73,9 +73,9 @@ def show_dashboard(df):
     with col2:
         st.metric("Total Items in Stock", int(df['quantity'].sum()))
     with col3:
-        st.metric("Total Inventory Value", f"${calculate_total_value(df):,.2f}")
+        st.metric("Total Inventory Value", f"₦{calculate_total_value(df):,.2f}")
     with col4:
-        st.metric("Total Sales", f"${sales_summary['total_sales']:,.2f}")
+        st.metric("Total Sales", f"₦{sales_summary['total_sales']:,.2f}")
 
     # Low stock alerts
     st.subheader("⚠️ Low Stock Alerts")
@@ -103,7 +103,7 @@ def show_inventory_management(df):
         with st.form("add_phone_form"):
             model = st.text_input("Model Name")
             brand = st.text_input("Brand")
-            price = st.number_input("Price ($)", min_value=0.0, step=0.01)
+            price = st.number_input("Price (₦)", min_value=0.0, step=0.01)
             quantity = st.number_input("Quantity", min_value=0, value=0, step=1)
 
             if st.form_submit_button("Add to Inventory"):
@@ -180,7 +180,7 @@ def show_sales_management(df):
         selected_phone = df[df['model'] == phone_model].iloc[0]
 
         st.info(f"Available stock: {int(selected_phone['quantity'])} units")
-        st.info(f"Unit price: ${selected_phone['price']:.2f}")
+        st.info(f"Unit price: ₦{selected_phone['price']:.2f}")
 
         # Sale details
         quantity = st.number_input("Quantity", min_value=1, max_value=int(selected_phone['quantity']), value=1)
@@ -270,7 +270,7 @@ def show_reports(df):
         # Key metrics
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("Total Sales Revenue", f"${sales_summary['total_sales']:,.2f}")
+            st.metric("Total Sales Revenue", f"₦{sales_summary['total_sales']:,.2f}")
         with col2:
             st.metric("Total Units Sold", sales_summary['total_units'])
 
