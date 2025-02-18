@@ -5,6 +5,13 @@ from datetime import datetime
 def init_auth():
     if 'user' not in st.session_state:
         st.session_state.user = None
+    elif st.session_state.user:
+        # Verify user still exists in database
+        session = Session()
+        user = session.query(User).filter_by(id=st.session_state.user['id']).first()
+        session.close()
+        if not user:
+            st.session_state.user = None
 
 def register_user(username, email, password, is_admin=False):
     session = Session()
