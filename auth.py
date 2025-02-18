@@ -98,13 +98,13 @@ def show_login_page():
             </div>
         """, unsafe_allow_html=True)
 
-    # Show registration tab only for admins
+    # Create tabs based on user status
+    tabs = ["🔑 Login"]
     if st.session_state.user and st.session_state.user.get('is_admin'):
-        tab1, tab2 = st.tabs(["🔑 Login", "✨ Manage Users"])
-    else:
-        tab1 = st.tabs(["🔑 Login"])[0]
-
-    with tab1:
+        tabs.append("✨ Manage Users")
+    
+    all_tabs = st.tabs(tabs)
+    with all_tabs[0]:
         st.markdown("<div class='form-container'>", unsafe_allow_html=True)
         with st.form("login_form"):
             st.markdown("### 👤 Welcome Back!")
@@ -129,8 +129,9 @@ def show_login_page():
                     st.error("⚠️ Please fill in all fields")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with tab2:
-        require_admin()  # Ensure only admins can access this tab
+    if len(all_tabs) > 1:
+        with all_tabs[1]:
+            require_admin()  # Ensure only admins can access this tab
         st.markdown("<div class='form-container'>", unsafe_allow_html=True)
         
         # User creation form
