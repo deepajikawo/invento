@@ -12,7 +12,7 @@ from utils import (
     get_sales_data,
     get_sales_summary
 )
-from models import PaymentMethod
+from models import PaymentMethod, Session, User
 from auth import init_auth, require_auth, require_admin, show_login_page, logout_user, register_user # Added import for register_user
 
 # Set page config first, before any other Streamlit commands
@@ -40,9 +40,10 @@ def main():
                 st.rerun()
 
         # Sidebar navigation
+        pages = ["Dashboard", "Manage Inventory", "Record Sale", "Reports", "Change Password"]
         page = st.sidebar.selectbox(
             "Navigation",
-            ["Dashboard", "Manage Inventory", "Record Sale", "Reports"]
+            pages
         )
 
         # Load inventory data
@@ -55,6 +56,8 @@ def main():
             show_inventory_management(df)
         elif page == "Record Sale":
             show_sales_management(df)
+        elif page == "Change Password":
+            show_password_change()
         else:
             show_reports(df)
     else:
@@ -297,6 +300,29 @@ def show_reports(df):
 
 if __name__ == "__main__":
     main()
+
+def show_password_change():
+    st.header("Change Password")
+    with st.form("change_password_form"):
+        current_password = st.text_input("Current Password", type="password")
+        new_password = st.text_input("New Password", type="password")
+        confirm_new_password = st.text_input("Confirm New Password", type="password")
+        
+        if st.form_submit_button("Change Password"):
+            if new_password != confirm_new_password:
+                st.error("New passwords do not match!")
+            else:
+                session = Session()
+                user = session.query(User).filter_by(id=st.session_state.user['id']).first()
+                if user and user.check_password(current_password):
+                    user.set_password(new_password)
+                    session.commit()
+                    st.success("Password changed successfully!")
+                else:
+                    st.error("Current password is incorrect!")
+                session.close()
+
+
 
 def show_login_page():
     st.title("Login")
