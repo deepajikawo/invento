@@ -161,21 +161,56 @@ def show_login_page():
                 else:
                     st.error("⚠️ Please fill in all fields")
         
-        # Display existing users
+        # Display existing users with edit functionality
         st.markdown("### 📋 Existing Users")
         session = Session()
         users = session.query(User).all()
         for user in users:
-            col1, col2, col3 = st.columns([2, 2, 1])
-            with col1:
-                st.write(f"👤 {user.username}")
-            with col2:
-                st.write(f"📧 {user.email}")
-            with col3:
-                if user.is_admin:
-                    st.write("🔑 Admin")
+            with st.expander(f"👤 {user.username}"):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.write(f"📧 Email: {user.email}")
+                    st.write("🔑 Admin" if user.is_admin else "👥 Regular User")
+                with col2:
+                    new_admin_status = st.checkbox("Admin Access", value=user.is_admin, key=f"admin_{user.id}")
+                    if st.button("Update Role", key=f"update_{user.id}"):
+                        user.is_admin = new_admin_status
+                        session.commit()
+                        st.success("User role updated successfully!")
+                        st.rerun()
+                    
+                    if st.button("Delete User", key=f"delete_{user.id}"):
+                        if user.id != st.session_state.user.get('id'):
+                            session.delete(user)
+                            session.commit()
+                            st.success("User deleted successfully!")
+                            st.rerun()
+                        else:
+                            st.error("Cannot delete your own account!")
         session.close()
         st.markdown("</div>", unsafe_allow_html=True)
+
+    # Password change section for logged-in users
+    if st.session_state.user:
+        st.markdown("### 🔒 Change Password")
+        with st.form("change_password_form"):
+            current_password = st.text_input("Current Password", type="password")
+            new_password = st.text_input("New Password", type="password")
+            confirm_new_password = st.text_input("Confirm New Password", type="password")
+            
+            if st.form_submit_button("Change Password"):
+                if new_password != confirm_new_password:
+                    st.error("New passwords do not match!")
+                else:
+                    session = Session()
+                    user = session.query(User).filter_by(id=st.session_state.user['id']).first()
+                    if user and user.check_password(current_password):
+                        user.set_password(new_password)
+                        session.commit()
+                        st.success("Password changed successfully!")
+                    else:
+                        st.error("Current password is incorrect!")
+                    session.close()
 
     # Footer
     st.markdown("""
