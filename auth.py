@@ -100,8 +100,10 @@ def show_login_page():
 
     # Create tabs based on user status
     tabs = ["🔑 Login"]
-    if st.session_state.user and st.session_state.user.get('is_admin'):
-        tabs.append("✨ Manage Users")
+    if st.session_state.user:
+        tabs.append("🔒 Change Password")
+        if st.session_state.user.get('is_admin'):
+            tabs.append("✨ Manage Users")
     
     all_tabs = st.tabs(tabs)
     with all_tabs[0]:
@@ -129,10 +131,36 @@ def show_login_page():
                     st.error("⚠️ Please fill in all fields")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    if len(all_tabs) > 1:
-        with all_tabs[1]:
-            require_admin()  # Ensure only admins can access this tab
-        st.markdown("<div class='form-container'>", unsafe_allow_html=True)
+    tab_index = 1
+    if len(all_tabs) > 1 and st.session_state.user:
+        with all_tabs[tab_index]:
+            st.markdown("<div class='form-container'>", unsafe_allow_html=True)
+            with st.form("change_password_form"):
+                st.markdown("### 🔒 Change Password")
+                current_password = st.text_input("Current Password", type="password")
+                new_password = st.text_input("New Password", type="password")
+                confirm_new_password = st.text_input("Confirm New Password", type="password")
+                
+                if st.form_submit_button("Change Password"):
+                    if new_password != confirm_new_password:
+                        st.error("New passwords do not match!")
+                    else:
+                        session = Session()
+                        user = session.query(User).filter_by(id=st.session_state.user['id']).first()
+                        if user and user.check_password(current_password):
+                            user.set_password(new_password)
+                            session.commit()
+                            st.success("Password changed successfully!")
+                        else:
+                            st.error("Current password is incorrect!")
+                        session.close()
+            st.markdown("</div>", unsafe_allow_html=True)
+            tab_index += 1
+        
+        if st.session_state.user.get('is_admin') and tab_index < len(all_tabs):
+            with all_tabs[tab_index]:
+                require_admin()  # Ensure only admins can access this tab
+                st.markdown("<div class='form-container'>", unsafe_allow_html=True)
         
         # User creation form
         with st.form("create_user_form"):
