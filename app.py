@@ -13,7 +13,7 @@ from utils import (
     get_sales_summary
 )
 from models import PaymentMethod
-from auth import init_auth, require_auth, require_admin, show_login_page, logout_user
+from auth import init_auth, require_auth, require_admin, show_login_page, logout_user, register_user # Added import for register_user
 
 # Set page config first, before any other Streamlit commands
 st.set_page_config(
@@ -297,3 +297,23 @@ def show_reports(df):
 
 if __name__ == "__main__":
     main()
+
+def show_login_page():
+    st.title("Login")
+    new_username = st.text_input("Username")
+    new_email = st.text_input("Email")
+    new_password = st.text_input("Password", type="password")
+    confirm_password = st.text_input("Confirm Password", type="password")
+    is_admin = st.checkbox("Register as Admin") # Added checkbox for admin registration
+    register_button = st.button("Register")
+    if register_button:
+        if new_username and new_email and new_password and confirm_password:
+            if new_password != confirm_password:
+                st.error("❌ Passwords do not match")
+            else:
+                success, message = register_user(new_username, new_email, new_password, is_admin) # Pass is_admin to register_user
+                if success:
+                    st.success(message)
+                    st.experimental_rerun() # Rerun to update session state after successful registration
+                else:
+                    st.error(message)
